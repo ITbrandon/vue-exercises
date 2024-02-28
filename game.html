@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+  <h1>Turn: Player {{player}}</h1>
+  <section class="scoreboard">
+    <h3 class="p1">P1 Score: {{p1score}}</h3>
+    <h3 class="p2">P2 Score: {{p2score}}</h3>
+  </section>
+  <section class="gameboard">
+    <div v-for="square in squares" :id="square.id" class="square" @click="playSquare()" :key="square.id"></div>
+  </section>
+  <div class="reset-btn" @click="superReset()">Reset</div>
+  <div class="alert-btn on" @click="toggleAlert()">Alert</div>
+  <script>
+    Vue.createApp({
+      data() {
+        return {
+          squares: [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7}, {id: 8}, {id: 9}],
+          player: 1,
+          p1state: [],
+          p2state: [],
+          winningPatterns: [['1','2','3'], ['4','5','6'], ['7','8','9'], ['1','4','7'], ['2','5','8'],
+           ['3','6','9'], ['1','5','9'], ['3','5','7']],
+          p1score: 0,
+          p2score: 0
+        }
+      },
+      methods: {
+        playSquare() {
+          if(event.target.textContent === '' && this.player === 1)
+          {
+            event.target.classList.add('p1');
+            event.target.textContent = 'X';
+            this.p1state.push(event.target.id);
+            this.player = 2;
+            setTimeout(()=> {
+              this.checkWin(1);
+              this.checkTie();
+            },100)
+          }
+          else
+          {
+            event.target.classList.add('p2');
+            event.target.textContent = 'O';
+            this.p2state.push(event.target.id);
+            this.player = 1;
+            setTimeout(()=> {
+              this.checkWin(2);
+              this.checkTie();
+            },100)  
+          }
+        },
+
+        checkWin(playerNumber) {
+          if(playerNumber === 1)
+          {
+            for(let i = 0; i < this.winningPatterns.length; i++)
+            {
+            const isWinner = this.winningPatterns[i].every(element => this.p1state.includes(element))
+
+            if(isWinner)
+            {
+              if(document.querySelector('.alert-btn').classList.contains('on'))
+              {
+              alert('Player 1 You Win')
+              }
+              this.p1score++;
+              this.reset();
+            }
+
+            }
+
+            
+          }
+          else
+          {
+            for(let i = 0; i < this.winningPatterns.length; i++)
+            {
+            const isWinner = this.winningPatterns[i].every(element => this.p2state.includes(element))
+
+            if(isWinner)
+            {
+              if(document.querySelector('.alert-btn').classList.contains('on'))
+              {
+              alert('Player 2 You Win')
+              }
+              this.p2score++;
+              this.reset();
+            }
+
+            }
+          
+          }
+        },
+
+        checkTie() {
+          if(this.p1state.length + this.p2state.length === 9)
+          {
+            alert('You Tied');
+            this.reset();
+          }
+        },
+
+        reset() {
+          this.p1state = [];
+          this.p2state = [];
+          const squares = document.querySelectorAll('.square');
+          squares.forEach(square => {
+          square.classList.remove('p1');
+          square.classList.remove('p2');
+          square.textContent = '';
+          })
+        },
+
+        superReset() {
+          this.p1score = 0;
+          this.p2score = 0;
+          this.player = 1;
+          this.p1state = [];
+          this.p2state = [];
+          const squares = document.querySelectorAll('.square');
+          squares.forEach(square => {
+          square.classList.remove('p1');
+          square.classList.remove('p2');
+          square.textContent = '';
+          })
+        },
+
+        toggleAlert() {
+          event.target.classList.toggle('on');
+          event.target.classList.toggle('off');
+        }
+      }
+    }).mount('body')
+  </script>
+
+  <style>
+
+    body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: monospace;
+    }
+
+    .square {
+      width: 100px;
+      height: 100px;
+      border: 2px solid black;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .gameboard {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      grid-gap: 1rem;
+    }
+
+    .scoreboard {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .p1 {
+      color: red;
+      font-size: 2rem;
+    }
+
+    .p2 {
+      color: blue;
+      font-size: 2rem;
+    }
+
+    .reset-btn {
+      padding: 0.5rem;
+      border-radius:50% ;
+      border: 2px solid black;
+      position: absolute;
+      cursor: pointer;
+      transition: 0.4s;
+      top: 4%;
+      left: 1%;
+    }
+
+    .reset-btn:hover {
+      color: white;
+      background-color: black;
+    }
+
+    .alert-btn {
+      padding: 0.5rem;
+      border-radius:50% ;
+      color: white;
+      border: 2px solid black;
+      position: absolute;
+      cursor: pointer;
+      transition: 0.4s;
+      top: 4%;
+      right: 1%;
+    }
+
+    .on {
+      background-color: green;
+    }
+
+    .off {
+      background-color: red;
+    }
+
+  </style>
+</body>
+</html>
